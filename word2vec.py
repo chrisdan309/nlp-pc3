@@ -9,10 +9,10 @@ class Word2vecProcessor:
 		self.min_count = min_count
 		self.sg = sg
 
-	def train_word2vec(self, corpus_path):
-		print("reading corpus")
-		with open(corpus_path, "r", encoding="utf-8") as f:
-			corpus = f.readlines()
+	def train_word2vec(self, corpus):
+		# print("reading corpus")
+		# with open(corpus_path, "r", encoding="utf-8") as f:
+		# 	corpus = f.readlines()
 		print("Training")
 		corpus_tokenizado = [simple_preprocess(doc) for doc in corpus]
 		self.model = Word2Vec(corpus_tokenizado, vector_size=self.vector_size, window=self.window, min_count=self.min_count, sg=self.sg)
