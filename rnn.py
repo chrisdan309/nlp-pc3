@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
-
+import os 
+import pickle
 class Sequence_RNN(nn.Module):
     def __init__(self, embedding_matrix, hidden_dim, output_dim):
         super(Sequence_RNN, self).__init__()
@@ -26,9 +27,12 @@ class Sequence_RNN(nn.Module):
                 target_batch.append(tokenized[i + seq_len])
         return torch.LongTensor(input_batch), torch.LongTensor(target_batch)
 
-    def train_model(self, input_batch, target_batch, num_epochs=500, learning_rate=0.001, print_every=100):
+    def train_model(self, input_batch, target_batch, num_epochs=500, learning_rate=0.001, print_every=100, save_every=250, save_path="model/"):
         criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(self.parameters(), lr=learning_rate)
+
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
 
         for epoch in range(num_epochs):
             optimizer.zero_grad()
@@ -38,6 +42,13 @@ class Sequence_RNN(nn.Module):
                 print(f"Epoch {epoch + 1}, Loss: {loss.item():.4f}")
             loss.backward()
             optimizer.step()
+
+            if (epoch + 1) % save_every == 0:
+                model_save_path = os.path.join(save_path, f"rnn_epoch_{epoch + 1}.pkl")
+                with open(model_save_path, "wb") as f:
+                    pickle.dump(self, f)
+                print(f"Modelo guardado en {model_save_path} después de {epoch + 1} épocas.")
+
 
     def generate_sequence(self, start_string, cluster_to_word, word_to_cluster, max_length=10, temperature=1.0):
         self.eval()
