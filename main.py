@@ -5,9 +5,9 @@ from rnn import Sequence_RNN
 import pickle
 
 corpus_path = "corpus/corpus_nltk.txt"
-output_model_path = "model/modelo_sg.word2vec"
-output_rnn_model_path = "model/trained_rnn_model.pkl"
-dictionary_path = "model/dictionary.pkl"
+output_model_path = "model2/modelo_sg.word2vec"
+output_rnn_model_path = "model2/trained_rnn_model.pkl"
+dictionary_path = "model2/dictionary.pkl"
 
 n_clusters = 1500
 # n_clusters = 200
@@ -24,8 +24,9 @@ seq_len = 10
 
 
 corpus_path = "corpus/eswiki-latest-pages-articles.txt"
+corpus_path = "corpus/Quijote.txt"
 corpus = preprocess_corpus_v2(corpus_path, batch_size=5000)
-print(len(corpus))
+print(corpus[:100])
 
 
 print("Word2Vec")
@@ -53,13 +54,13 @@ with open(dictionary_path, "wb") as f:
     pickle.dump(dictionary, f)
 
 
-print("Diccionario de clusters:", word_to_cluster)
+# print("Diccionario de clusters:", word_to_cluster)
 
 input_batch, target_batch = Sequence_RNN.make_batch(corpus, word_to_cluster, seq_len)
 
 output_dim = len(centroids)
 model = Sequence_RNN(embedding_matrix=centroids, hidden_dim=n_hidden, output_dim=output_dim)
-model.train_model(input_batch, target_batch, num_epochs=epochs, print_every=100, save_every=250, save_path="model/")
+model.train_model(input_batch, target_batch, num_epochs=epochs, print_every=100, save_every=250, save_path="model2/")
 
 
 # Guardar el modelo entrenado
