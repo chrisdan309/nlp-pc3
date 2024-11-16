@@ -4,25 +4,12 @@ from wordVectorQuantization import EmbeddingQuantizer
 from rnn import Sequence_RNN
 import pickle
 
-def preprocess_corpus(corpus, min_sentence_length=5):
-    import re
-    processed_corpus = []
-    for line in corpus:
-        line = re.sub(r'\*\d+\*', '', line) 
-        line = re.sub(r'-F\w+-', '', line)
-        line = re.sub(r'[^\w\s_]', '', line)
-        line = line.lower()
-        words = line.split()
-        if len(words) >= min_sentence_length:
-            processed_corpus.append(" ".join(words))
-    return processed_corpus
-
 corpus_path = "corpus/corpus_nltk.txt"
 output_model_path = "model/modelo_sg.word2vec"
 output_rnn_model_path = "model/trained_rnn_model.pkl"
 dictionary_path = "model/dictionary.pkl"
 
-n_clusters = 1000
+n_clusters = 1500
 # n_clusters = 200
 epochs = 1000
 # epochs = 10
@@ -38,14 +25,13 @@ seq_len = 10
 
 corpus_path = "corpus/eswiki-latest-pages-articles.txt"
 corpus = preprocess_corpus_v2(corpus_path, batch_size=5000)
-
+print(len(corpus))
 
 
 print("Word2Vec")
 processor = Word2vecProcessor(vector_size=100, window=5, min_count=1, sg=1)
 processor.train_word2vec(corpus)
 processor.save_model(output_model_path)
-print(processor.find_most_similar("natural", 10))
 
 
 print("Cuantizando embeddings")
