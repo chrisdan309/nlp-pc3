@@ -205,7 +205,7 @@ def forward(self, X):
        return initial_context + result[len(initial_context):]
    ```
 
-
+![alt text](images/results.png)
 
 ### Explicación del Código de la Clase `EmbeddingQuantizer`
 
