@@ -21,18 +21,15 @@ corpus_path = "corpus/eswiki-latest-pages-articles.txt"
 output_model_path = "model/quantized_model.word2vec"
 output_rnn_model_path = "model/trained_rnn_model.pkl"
 
-# Hiperparámetros
 epochs = 1000
 n_hidden = 10
 seq_len = 10
 vector_size = 50
-bitlevel = 2  # Cuantización de 2 bits
+bitlevel = 2 
 
-# Preprocesar el corpus
 print("Preprocesando el corpus...")
 corpus = preprocess_corpus_v2(corpus_path, batch_size=1000)
 
-# Entrenar el modelo QuantizedWord
 print("Entrenando modelo Word2Vec cuantizado...")
 quantized_processor = QuantizedWord(
     vector_size=vector_size,
@@ -43,10 +40,8 @@ quantized_processor = QuantizedWord(
 )
 quantized_processor.train(corpus)
 
-# Guardar el modelo entrenado
 quantized_processor.save_model(output_model_path)
 
-# Obtener los vectores cuantizados
 print("Obteniendo embeddings cuantizados...")
 quantized_embeddings = {
     word: quantized_processor.get_vector(word)
@@ -54,11 +49,9 @@ quantized_embeddings = {
 }
 print(f"Total de palabras en el vocabulario: {len(quantized_embeddings)}")
 
-# Crear el diccionario de vectores (directo del modelo cuantizado)
 word_to_index = {word: idx for idx, word in enumerate(quantized_embeddings.keys())}
 index_to_word = {idx: word for word, idx in word_to_index.items()}
 
-# Guardar el diccionario
 dictionary = {
     "word_to_index": word_to_index,
     "index_to_word": index_to_word
@@ -70,11 +63,9 @@ with open(dictionary_path, "wb") as f:
 
 print("Diccionario guardado en", dictionary_path)
 
-# Crear batches para entrenar la RNN
 print("Preparando datos para la RNN...")
 input_batch, target_batch = Sequence_RNN.make_batch(corpus, word_to_index, seq_len)
 
-# Configurar y entrenar la RNN
 embedding_matrix = np.array(list(quantized_embeddings.values()), dtype=np.float32)
 
 output_dim = len(word_to_index)
@@ -84,12 +75,10 @@ model = Sequence_RNN(embedding_matrix=embedding_matrix, hidden_dim=n_hidden, out
 print("Entrenando modelo RNN...")
 model.train_model(input_batch, target_batch, num_epochs=epochs, print_every=100, save_every=250, save_path="model/")
 
-# Guardar el modelo RNN entrenado
 with open(output_rnn_model_path, "wb") as f:
     pickle.dump(model, f)
 print(f"Modelo RNN guardado en {output_rnn_model_path}")
 
-# Probar la generación de secuencias con el modelo RNN
 print("Probando la generación de secuencias...")
 cad = "el grupo estatal del área"
 generated_seq = model.generate_sequence(cad, index_to_word, word_to_index, max_length=15, temperature=1.0)

@@ -14,7 +14,7 @@ class Sequence_RNN(nn.Module):
     def forward(self, X):
         embeds = self.embedding(X)
         out, _ = self.rnn(embeds)
-        out = self.fc(out[:, -1, :])  # Usamos solo la última salida de la RNN
+        out = self.fc(out[:, -1, :])
         return out
 
     @staticmethod
@@ -73,32 +73,3 @@ class Sequence_RNN(nn.Module):
 
         initial_context = tokens
         return initial_context + result[len(initial_context):]
-
-# Preparar los datos y entrenar el modelo
-if __name__ == "__main__":
-    # Supongamos que tienes `quantized_embeddings`, `word_to_index` e `index_to_word`
-    embedding_matrix = list(quantized_embeddings.values())
-    word_to_index = {word: idx for idx, word in enumerate(quantized_embeddings.keys())}
-    index_to_word = {idx: word for word, idx in word_to_index.items()}
-
-    # Configuración de hiperparámetros
-    hidden_dim = 10
-    output_dim = len(word_to_index)  # El tamaño del vocabulario
-    seq_len = 10
-    epochs = 1000
-    learning_rate = 0.001
-
-    # Crear batches
-    print("Preparando datos...")
-    input_batch, target_batch = Sequence_RNN.make_batch(corpus, word_to_index, seq_len)
-
-    # Crear el modelo
-    print("Creando y entrenando el modelo RNN...")
-    rnn_model = Sequence_RNN(embedding_matrix, hidden_dim, output_dim)
-    rnn_model.train_model(input_batch, target_batch, num_epochs=epochs, learning_rate=learning_rate)
-
-    # Probar la generación de secuencias
-    print("Generando secuencia...")
-    start_string = "el grupo estatal del área"
-    generated_sequence = rnn_model.generate_sequence(start_string, index_to_word, word_to_index, max_length=15)
-    print("Secuencia generada:", " ".join(generated_sequence))

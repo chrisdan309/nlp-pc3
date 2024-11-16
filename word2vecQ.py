@@ -24,8 +24,8 @@ class QuantizedWord:
             raise ValueError("Unsupported bitlevel. Use 1 or 2.")
 
     def straight_through_estimator(self, quantized, original):
-        return original  # El gradiente se propaga como si no hubiera cuantización
-
+        return original
+    
     def train(self, corpus):
         tokenized_corpus = [sentence.split() for sentence in corpus]
         print("Training")
